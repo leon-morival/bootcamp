@@ -1,31 +1,59 @@
-from typing import Optional
 from ninja import NinjaAPI, ModelSchema, Schema
 from polls.models import Game, Player
-from datetime import date
+from typing import List
 from polls.services import create_game
-# from polls.services import add_question
 api = NinjaAPI()
 
-# Game
 class GameSchema(ModelSchema):
-    class Meta:
+     class Meta:
         model = Game
-        fields = ["id", "name", "turn", "ended"]
-        
+        fields = [
+            "id",
+            "name",
+            "turn",
+            "ended",
+        ]
+
+
+
 class PlayerSchema(ModelSchema):
-    class Meta:
+     class Meta:
         model = Player
-        fields = ["id", "name", "score"]
-
+        fields = [
+            "id",
+            "name",
+            "score",
+        ]
+     
 class AddGame(Schema):
-    name: str
-    players: list[str]
-
+     name: str
+     players: List[str]
+     
 class UpdateGame(Schema):
-    name: Optional[str]
-    question_text: Optional[str]
-    choices: Optional[list[str]]
+     name: str
+     players: List[str]
+
 
 @api.post("/create_game", response=GameSchema)
-def add_game(request, game: AddGame):
-    return create_game(game_name=game, players=list[str])
+def add(request, game: AddGame):
+    new_game = create_game(game.name, game.players)
+    return new_game
+
+@api.get("/game/{id}", response=GameSchema)
+def get(request, game_id: int):
+    current_game = Game.objects.get(pk=game_id)
+    return current_game
+
+@api.delete("/delete_game/{id}")
+def delete(request, game_id:int):
+     delete_game = Game.objects.get(pk=game_id)
+     delete_game.delete()
+     return delete_game
+
+@api.put("/update_game", response=GameSchema)
+def update(request, game_id: int, data: UpdateGame):
+    game = Game.objects.get(pk=game_id)
+    game.name = data.name
+    game.save()
+    return game
+

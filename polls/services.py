@@ -1,6 +1,5 @@
 from polls.models import Game, Player, Question, Choice
 from datetime import date
-from polls.urls import AddQuestion
 def create_game(game_name: str, players: list[str]):
     game = Game.objects.create(name=game_name)
     for name in players:

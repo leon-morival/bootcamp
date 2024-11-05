@@ -25,12 +25,13 @@ SECRET_KEY = 'django-insecure-a5-i6*h8)^m#fgts9wce1x8=7%x%h-exb)4#n-73%!suw5k69w
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,6 +49,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'blackjack.urls'
@@ -70,7 +73,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'blackjack.wsgi.application'
 
-
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Origine de votre frontend
+]
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
