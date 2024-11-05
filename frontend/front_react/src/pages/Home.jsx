@@ -1,19 +1,23 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import useManageGame from "../hooks/useManageGame";
 
 export default function Home() {
   const { createGame } = useManageGame();
-
-  // State pour le nom de la partie et les joueurs
+  const navigate = useNavigate();
   const [gameName, setGameName] = useState("");
   const [playerNames, setPlayerNames] = useState("");
 
   const handleCreateGame = () => {
-    // Séparer les noms des joueurs par des virgules et les transformer en tableau
     const playersArray = playerNames.split(",").map((name) => name.trim());
-    createGame(gameName, playersArray);
-    setGameName("");
-    setPlayerNames("");
+
+    createGame(gameName, playersArray).then((newGameId) => {
+      if (newGameId) {
+        navigate(`/game/${newGameId}`);
+      } else {
+        console.error("Error: Game ID not returned");
+      }
+    });
   };
 
   return (

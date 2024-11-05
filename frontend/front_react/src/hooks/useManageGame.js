@@ -1,6 +1,6 @@
 function useManageGame() {
   const createGame = (gameName, players) => {
-    fetch("http://127.0.0.1:8000/api/create_game", {
+    return fetch("http://127.0.0.1:8000/api/create_game", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -10,9 +10,15 @@ function useManageGame() {
         players: players,
       }),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
       .then((data) => {
         console.log("Game created:", data);
+        return data.id;
       })
       .catch((error) => {
         console.error("Error creating game:", error);
@@ -34,13 +40,13 @@ function useManageGame() {
       })
       .then((data) => {
         console.log("Game details:", data);
+        return data;
       })
       .catch((error) => {
         console.error("Error fetching game:", error);
       });
   };
 
-  // Retourne les fonctions pour qu'elles soient accessibles à l'extérieur
   return { createGame, getGame };
 }
 
