@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 function useManageGame() {
   const createGame = (gameName, players) => {
     return fetch("http://127.0.0.1:8000/api/create_game", {
@@ -25,8 +26,8 @@ function useManageGame() {
       });
   };
 
-  const getGame = (id) => {
-    fetch(`http://127.0.0.1:8000/api/game/${id}?game_id=${id}`, {
+  const getGame = useCallback((id) => {
+    return fetch(`http://127.0.0.1:8000/api/game/${id}?game_id=${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -45,9 +46,31 @@ function useManageGame() {
       .catch((error) => {
         console.error("Error fetching game:", error);
       });
-  };
+  }, []);
 
-  return { createGame, getGame };
+  const getPlayers = useCallback((gameId) => {
+    return fetch(`http://127.0.0.1:8000/api/game/${gameId}/players`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Game details:", data);
+        return data;
+      })
+      .catch((error) => {
+        console.error("Error fetching game:", error);
+      });
+  }, []);
+
+  return { createGame, getGame, getPlayers };
 }
 
 export default useManageGame;

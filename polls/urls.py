@@ -12,6 +12,7 @@ class GameSchema(ModelSchema):
             "name",
             "turn",
             "ended",
+     
         ]
 
 
@@ -57,3 +58,7 @@ def update(request, game_id: int, data: UpdateGame):
     game.save()
     return game
 
+@api.get("/game/{game_id}/players", response=list[PlayerSchema])
+def get_players(request, game_id: int):
+    players = Player.objects.filter(game_id=game_id)  # Filtrer les joueurs par game_id
+    return players

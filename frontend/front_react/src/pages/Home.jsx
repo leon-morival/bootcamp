@@ -21,7 +21,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center justify-center min-h-screen content-center">
       <div className="flex flex-col items-center mt-8 space-y-4">
         <label htmlFor="gameName" className="text-lg font-medium">
           Nom de la partie:
@@ -36,7 +36,7 @@ export default function Home() {
         />
 
         <label htmlFor="playerNames" className="text-lg font-medium">
-          Noms des joueurs (séparés par des virgules):
+          Noms des joueurs :
         </label>
         <input
           type="text"
