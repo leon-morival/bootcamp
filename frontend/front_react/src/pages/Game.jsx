@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import useManageGame from "../hooks/useManageGame";
+import { Link } from "react-router-dom";
+import Confetti from "react-confetti";
+import Dice from "react-dice-roll"; // Importer le composant Dice
 
 export default function Game() {
   const { id } = useParams();
@@ -8,9 +11,11 @@ export default function Game() {
   const [gameDetails, setGameDetails] = useState(null);
   const [players, setPlayers] = useState([]);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0); // Suivi du joueur courant
-  const [numDice, setNumDice] = useState(1); // Nombre de dés à lancer
-  const [diceResults, setDiceResults] = useState([]); // Résultats des lancers
-  const [gameOver, setGameOver] = useState(false); // Indique si la partie est finie
+  const [gameOver, setGameOver] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [message, setMessage] = useState(""); // Message à afficher (busted, terminé...)
+  const [diceRollCount, setDiceRollCount] = useState(0); // Compteur de lancers de dés pour chaque joueur (max 3)
+  const [diceResults, setDiceResults] = useState([]); // Résultats des lancers de dés
 
   useEffect(() => {
     const fetchGameDetails = async () => {
@@ -39,29 +44,21 @@ export default function Game() {
     fetchPlayers();
   }, [id, getGame, getPlayers]);
 
-  const rollDice = () => {
-    // Simuler le lancer des dés
-    const results = [];
-    for (let i = 0; i < numDice; i++) {
-      results.push(Math.floor(Math.random() * 6) + 1); // Résultat entre 1 et 6
-    }
-
-    // Mettre à jour les résultats et le score du joueur courant
+  const handleDiceRoll = (value) => {
     const updatedPlayers = [...players];
     const currentPlayer = updatedPlayers[currentPlayerIndex];
-    const score = results.reduce((acc, value) => acc + value, 0); // Somme des dés
-    currentPlayer.score += score; // Mettre à jour le score
+    currentPlayer.score += value;
 
-    // Vérifier si le joueur a busté (score > 21)
     if (currentPlayer.score > 21) {
-      currentPlayer.busted = true; // Marquer comme "busté"
+      currentPlayer.busted = true;
       setPlayers(updatedPlayers);
-      setDiceResults(results); // Afficher les résultats des dés
-      setMessage(`${currentPlayer.name} a dépassé 21 et a perdu son tour.`);
+      setDiceResults([value]);
+      setMessage(`${currentPlayer.name} a bust.`);
       passTurn();
     } else {
       setPlayers(updatedPlayers);
-      setDiceResults(results); // Afficher les résultats des dés
+      setDiceResults([value]);
+      setDiceRollCount(diceRollCount + 1);
     }
   };
 
@@ -87,11 +84,11 @@ export default function Game() {
       determineWinner();
     } else {
       setCurrentPlayerIndex(nextPlayerIndex);
+      setDiceRollCount(0); // Réinitialiser le compteur de lancers pour le joueur suivant
     }
   };
 
   const determineWinner = () => {
-    // Trouver le joueur le plus proche de 21 sans dépasser
     let winner = null;
     let highestScore = 0;
 
@@ -103,41 +100,23 @@ export default function Game() {
     });
 
     if (winner) {
-      alert(`${winner.name} a gagné avec un score de ${winner.score}!`);
+      alert(`${winner.name} a gagné !`);
+      setShowConfetti(true); // Déclenche l'affichage des confettis
     } else {
-      alert("Aucun gagnant, tout le monde a busté.");
     }
   };
-
-  const [message, setMessage] = useState(""); // Message pour affichage (gain, bust, etc.)
 
   if (!gameDetails || players.length === 0)
     return <h1>Game or Players not found.</h1>;
 
   return (
-    <div className="max-w-sm p-6 bg-white border border-gray-600 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 flex flex-col items-center">
+    <div className="max-w-sm p-6 border text-black border-gray-600 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 flex flex-col items-center bg-gray-50">
       <h1 className="text-center text-3xl font-bold">BlackJack</h1>
-      <h5 className="mb-2 text-2xl tracking-tight text-gray-900 dark:text-white text-center">
+      <h5 className="mb-2 text-2xl tracking-tight text-center">
         Nom de la partie : {gameDetails.name}
       </h5>
 
-      <input
-        type="number"
-        max="3"
-        min="1"
-        className="w-20 p-2 border border-gray-300 rounded-md text-center focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4"
-        placeholder="0"
-        value={numDice}
-        onChange={(e) => setNumDice(parseInt(e.target.value))}
-      />
-
       <div className="flex justify-center mt-4 space-x-4">
-        <button
-          onClick={rollDice}
-          className="px-4 py-2 font-semibold text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
-        >
-          Lancer les dés
-        </button>
         <button
           onClick={passTurn}
           className="px-4 py-2 font-semibold text-white bg-gray-500 rounded hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400"
@@ -146,14 +125,11 @@ export default function Game() {
         </button>
       </div>
 
-      <h3 className="text-center mt-6 text-lg font-semibold text-gray-700 dark:text-gray-300">
+      <h3 className="text-center mt-6 text-lg font-semibold dark:text-gray-300">
         ScoreBoard
       </h3>
 
       <div className="mt-4">
-        <h4 className="text-xl font-semibold text-gray-900 dark:text-white text-center">
-          Players
-        </h4>
         <ul className="mt-2">
           {players.map((player, index) => (
             <li key={player.id} className="text-center">
@@ -166,7 +142,6 @@ export default function Game() {
               )}
               {index === currentPlayerIndex && !gameOver && (
                 <span className="ml-2 text-blue-500">
-                  {" "}
                   (C'est à vous de jouer)
                 </span>
               )}
@@ -186,6 +161,26 @@ export default function Game() {
           La partie est terminée!
         </div>
       )}
+
+      {showConfetti && (
+        <Confetti width={window.innerWidth} height={window.innerHeight} />
+      )}
+
+      <div className="mt-4">
+        <Dice
+          faceBg="white"
+          size={60} // Taille du dé
+          rollingTime={500} // Temps pour chaque lancer de dé
+          onRoll={handleDiceRoll} // Appeler handleDiceRoll avec la valeur du dé
+        />
+      </div>
+
+      <Link
+        to="/"
+        className="text-white bg-black px-3 py-2 rounded hover:text-gray-200 hover:bg-gray-800"
+      >
+        Home
+      </Link>
     </div>
   );
 }
