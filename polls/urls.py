@@ -34,6 +34,9 @@ class UpdateGame(Schema):
      name: str
      players: List[str]
 
+class PlayerUpdateSchema(Schema):
+    id: int
+    score: int
 
 @api.post("/create_game", response=GameSchema)
 def add(request, game: AddGame):
@@ -62,3 +65,18 @@ def update(request, game_id: int, data: UpdateGame):
 def get_players(request, game_id: int):
     players = Player.objects.filter(game_id=game_id)  # Filtrer les joueurs par game_id
     return players
+
+@api.put("/game/{game_id}/update_scores", response=list[PlayerSchema])
+def update_scores(request, game_id: int, data: List[PlayerUpdateSchema]):
+
+    game = Game.objects.get(id=game_id)
+    updated_players = []
+
+    # Mettre à jour les scores des joueurs
+    for player_data in data:
+        player = Player.objects.get(id=player_data.id, game=game)
+        player.score = player_data.score
+        player.save()
+        updated_players.append(player)
+
+    return updated_players

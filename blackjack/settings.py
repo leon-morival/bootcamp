@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'polls.apps.PollsConfig',
+    'channels',
+
 ]
 
 MIDDLEWARE = [
@@ -72,6 +74,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'blackjack.wsgi.application'
+ASGI_APPLICATION = "polls.asgi.application"
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Origine de votre frontend

@@ -17,6 +17,7 @@ def change_score(player_id, new_score):
     player.score = new_score
     player.save()
 
+
 # def add_question(request):
 #     new_question = Question.objects.create(question_text=AddQuestion.question_text, pub_date=date.today())
 #     for choice_text in AddQuestion.choices:

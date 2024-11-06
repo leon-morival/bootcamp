@@ -53,7 +53,8 @@ export default function Game() {
       currentPlayer.busted = true;
       setPlayers(updatedPlayers);
       setDiceResults([value]);
-      setMessage(`${currentPlayer.name} a bust.`);
+      passTurn();
+    } else if (currentPlayer.score == 21) {
       passTurn();
     } else {
       setPlayers(updatedPlayers);
@@ -100,36 +101,26 @@ export default function Game() {
     });
 
     if (winner) {
-      alert(`${winner.name} a gagné !`);
+      // alert(`${winner.name} a gagné !`);
       setShowConfetti(true); // Déclenche l'affichage des confettis
     } else {
     }
   };
 
   if (!gameDetails || players.length === 0)
-    return <h1>Game or Players not found.</h1>;
+    return <h1 className="text-white">Game or Players not found.</h1>;
 
   return (
-    <div className="max-w-sm p-6 border text-black border-gray-600 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 flex flex-col items-center bg-gray-50">
-      <h1 className="text-center text-3xl font-bold">BlackJack</h1>
-      <h5 className="mb-2 text-2xl tracking-tight text-center">
-        Nom de la partie : {gameDetails.name}
+    <div className=" p-6  text-white flex flex-col items-center ">
+      <h1 className="text-center text-8xl font-semibold py-5">BlackJack</h1>
+      <h5 className="mb-4 mt-2 text-2xl tracking-tight text-center">
+        Partie : {gameDetails.name}
       </h5>
 
-      <div className="flex justify-center mt-4 space-x-4">
-        <button
-          onClick={passTurn}
-          className="px-4 py-2 font-semibold text-white bg-gray-500 rounded hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400"
-        >
-          Terminer le tour
-        </button>
-      </div>
-
-      <h3 className="text-center mt-6 text-lg font-semibold dark:text-gray-300">
-        ScoreBoard
-      </h3>
-
-      <div className="mt-4">
+      <div className="py-5 px-16 border-4">
+        <h3 className="text-center mt-2 text-lg font-semibold dark:text-gray-300">
+          ScoreBoard
+        </h3>
         <ul className="mt-2">
           {players.map((player, index) => (
             <li key={player.id} className="text-center">
@@ -148,6 +139,22 @@ export default function Game() {
             </li>
           ))}
         </ul>
+        <div className="mt-4">
+          <Dice
+            faceBg="transparent"
+            size={60} // Taille du dé
+            rollingTime={500} // Temps our chaque lancer de dé
+            onRoll={handleDiceRoll} // Appeler handleDiceRoll avec la valeur du dé
+          />
+        </div>
+        <div className="flex justify-center mt-4 space-x-4">
+          <button
+            onClick={passTurn}
+            className="px-4 py-2 font-semibold text-white bg-black rounded hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400"
+          >
+            Terminer le tour
+          </button>
+        </div>
       </div>
 
       {message && (
@@ -158,7 +165,7 @@ export default function Game() {
 
       {gameOver && (
         <div className="mt-4 text-center text-lg font-semibold text-gray-700 dark:text-gray-300">
-          La partie est terminée!
+          {/* La partie est terminée! */}
         </div>
       )}
 
@@ -166,18 +173,9 @@ export default function Game() {
         <Confetti width={window.innerWidth} height={window.innerHeight} />
       )}
 
-      <div className="mt-4">
-        <Dice
-          faceBg="white"
-          size={60} // Taille du dé
-          rollingTime={500} // Temps pour chaque lancer de dé
-          onRoll={handleDiceRoll} // Appeler handleDiceRoll avec la valeur du dé
-        />
-      </div>
-
       <Link
         to="/"
-        className="text-white bg-black px-3 py-2 rounded hover:text-gray-200 hover:bg-gray-800"
+        className="text-black bg-white mt-2 px-3 py-2 rounded hover:text-gray-200 hover:bg-gray-800"
       >
         Home
       </Link>

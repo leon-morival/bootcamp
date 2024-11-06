@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useManageGame from "../hooks/useManageGame";
-import { FaGamepad, FaUser, FaPlus } from "react-icons/fa"; // Exemple d'icônes de FontAwesome
+import { FaGamepad, FaUser, FaPlus } from "react-icons/fa";
+import { FaXmark } from "react-icons/fa6";
 
 export default function Home() {
   const { createGame } = useManageGame();
@@ -22,7 +23,10 @@ export default function Home() {
     newPlayerNames[index] = value; // Mettre à jour le nom du joueur à l'index spécifié
     setPlayerNames(newPlayerNames);
   };
-
+  const removePlayer = (id) => {
+    const updatedPlayers = playerNames.filter((player) => player.id !== id);
+    setPlayerNames(updatedPlayers);
+  };
   const handleCreateGame = () => {
     const playersArray = playerNames.filter((name) => name.trim() !== ""); // Filtrer les joueurs vides
     createGame(gameName, playersArray).then((newGameId) => {
@@ -35,8 +39,8 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center text-white">
-      <h1 className="text-7xl font-bold">BlackJack</h1>
+    <div className="flex flex-col items- text-white">
+      <h1 className="text-8xl font-semibold ">BlackJack</h1>
       <div className="flex flex-col items-center mt-8 space-y-4">
         {/* Champ de saisie du nom de la partie */}
         <div className="flex items-center space-x-2">
@@ -64,20 +68,24 @@ export default function Home() {
               placeholder={`Joueur ${index + 1}`}
               required
             />
+            <FaXmark className="text-white" size={27} />
+            <button className="Delete" onClick={() => removePlayer(index)}>
+              X
+            </button>
           </div>
         ))}
 
         {/* Bouton "+" pour ajouter un joueur */}
         <button
           onClick={addPlayerInput}
-          className="px-3 py-2 bg-black text-white rounded-md shadow hover:bg-gray-600 mt-2"
+          className="px-3 py-2 bg-black text-white rounded-md shadow hover:bg-gray-800 mt-2"
         >
           <FaPlus />
         </button>
 
         <button
           onClick={handleCreateGame}
-          className="px-4 py-2 bg-blue-500 text-white rounded-md shadow hover:bg-blue-600 mt-4"
+          className="px-4 py-2 bg-black text-white rounded-none  shadow  mt-4"
         >
           Create Game
         </button>
