@@ -2,19 +2,22 @@
 
 ## Description
 
-Description brève de votre projet. Expliquez son objectif, ses fonctionnalités principales, et son utilité.
+Jeu de Black Jack simplifié qui se joue avec des dés, 
+développer en React pour le Frontend et Django pour le Backend
 
-Installation des dépendances
-
-- Python : [Télécharger et installer Python](https://www.python.org/downloads/)
-- Node.js : [Télécharger et installer Node.js](https://nodejs.org/)
+## Installation
 
 ### BackEnd
 
-`cd .\backend`
-`python manage.py runserver`
+```bash
+cd .\backend
+python manage.py runserver
+```
 
 ### FrontEnd
 
-`cd .\frontend\front_react\`
-`npm run dev c'est pour un readme`
+```bash
+cd .\frontend\front_react\
+npm install
+npm run dev
+```
