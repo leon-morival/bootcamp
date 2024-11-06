@@ -7,7 +7,7 @@ import Dice from "react-dice-roll"; // Importer le composant Dice
 
 export default function Game() {
   const { id } = useParams();
-  const { getGame, getPlayers } = useManageGame();
+  const { getGame, getPlayers, nextTurn } = useManageGame();
   const [gameDetails, setGameDetails] = useState(null);
   const [players, setPlayers] = useState([]);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0); // Suivi du joueur courant
@@ -63,29 +63,18 @@ export default function Game() {
     }
   };
 
-  const passTurn = () => {
-    // Marquer le joueur actuel comme terminé
-    const updatedPlayers = [...players];
-    const currentPlayer = updatedPlayers[currentPlayerIndex];
-    currentPlayer.finished = true; // Le joueur a terminé son tour
-    setPlayers(updatedPlayers);
-
-    // Passer au joueur suivant, ignorer les joueurs qui sont bustés ou ont terminé leur tour
-    let nextPlayerIndex = currentPlayerIndex + 1;
-    while (
-      nextPlayerIndex < players.length &&
-      (players[nextPlayerIndex].busted || players[nextPlayerIndex].finished)
-    ) {
-      nextPlayerIndex++;
-    }
-
-    // Si tous les joueurs ont terminé, fin de la partie
-    if (nextPlayerIndex >= players.length) {
-      setGameOver(true);
-      determineWinner();
-    } else {
-      setCurrentPlayerIndex(nextPlayerIndex);
-      setDiceRollCount(0); // Réinitialiser le compteur de lancers pour le joueur suivant
+  const passTurn = async () => {
+    try {
+      const nextTurnData = await nextTurn(id);
+      if (nextTurnData.gameOver) {
+        setGameOver(true);
+        determineWinner();
+      } else {
+        setCurrentPlayerIndex(nextTurnData.nextPlayerIndex);
+        setDiceRollCount(0);
+      }
+    } catch (error) {
+      console.error("Error advancing turn:", error);
     }
   };
 

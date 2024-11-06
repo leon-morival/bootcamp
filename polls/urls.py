@@ -71,8 +71,6 @@ def update_scores(request, game_id: int, data: List[PlayerUpdateSchema]):
 
     game = Game.objects.get(id=game_id)
     updated_players = []
-
-    # Mettre à jour les scores des joueurs
     for player_data in data:
         player = Player.objects.get(id=player_data.id, game=game)
         player.score = player_data.score
@@ -80,3 +78,25 @@ def update_scores(request, game_id: int, data: List[PlayerUpdateSchema]):
         updated_players.append(player)
 
     return updated_players
+
+@api.post("/game/{game_id}/next_turn")
+def next_turn(request, game_id: int):
+
+    game = Game.objects.get(id=game_id)
+    players = game.players.all()
+
+    current_turn = game.turn
+    next_turn = (current_turn + 1) % len(players) 
+    for i in range(len(players)):
+        player = players[next_turn]
+        if not player.busted and not player.finished:
+            game.turn = next_turn
+            game.save()
+            return {"nextPlayerIndex": next_turn, "gameOver": False}
+        next_turn = (next_turn + 1) % len(players)
+
+    game.ended = True
+    game.save()
+    return {"gameOver": True}
+
+ 

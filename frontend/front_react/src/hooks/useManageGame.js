@@ -69,8 +69,29 @@ function useManageGame() {
         console.error("Error fetching game:", error);
       });
   }, []);
+  const nextTurn = (gameId) => {
+    return fetch(`http://127.0.0.1:8000/api/game/${gameId}/next_turn`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Next turn data:", data);
+        return data;
+      })
+      .catch((error) => {
+        console.error("Error advancing turn:", error);
+      });
+  };
 
-  return { createGame, getGame, getPlayers };
+  return { createGame, getGame, getPlayers, nextTurn };
 }
 
 export default useManageGame;
