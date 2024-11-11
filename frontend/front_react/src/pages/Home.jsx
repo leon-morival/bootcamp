@@ -8,41 +8,42 @@ export default function Home() {
   const { createGame } = useManageGame();
   const navigate = useNavigate();
 
-  // Utilisation d'un tableau pour stocker les noms des joueurs
   const [gameName, setGameName] = useState("");
-  const [playerNames, setPlayerNames] = useState([""]); // Tableau pour les noms de joueurs
+  const [playerNames, setPlayerNames] = useState([""]);
 
-  // Fonction pour gérer l'ajout d'un champ de saisie supplémentaire pour un joueur
   const addPlayerInput = () => {
-    setPlayerNames([...playerNames, ""]); // Ajouter un champ vide au tableau
+    setPlayerNames([...playerNames, ""]);
   };
 
-  // Fonction pour gérer le changement de valeur d'un joueur
   const handlePlayerChange = (index, value) => {
     const newPlayerNames = [...playerNames];
-    newPlayerNames[index] = value; // Mettre à jour le nom du joueur à l'index spécifié
+    newPlayerNames[index] = value;
     setPlayerNames(newPlayerNames);
   };
-  const removePlayer = (id) => {
-    const updatedPlayers = playerNames.filter((player) => player.id !== id);
+
+  const removePlayer = (index) => {
+    const updatedPlayers = playerNames.filter((_, i) => i !== index);
     setPlayerNames(updatedPlayers);
   };
-  const handleCreateGame = () => {
-    const playersArray = playerNames.filter((name) => name.trim() !== ""); // Filtrer les joueurs vides
-    createGame(gameName, playersArray).then((newGameId) => {
+
+  const handleCreateGame = async () => {
+    const playersArray = playerNames.filter((name) => name.trim() !== "");
+    try {
+      const newGameId = await createGame(gameName, playersArray);
       if (newGameId) {
         navigate(`/game/${newGameId}`);
       } else {
         console.error("Error: Game ID not returned");
       }
-    });
+    } catch (error) {
+      console.error("Error creating game:", error);
+    }
   };
 
   return (
-    <div className="flex flex-col items- text-white">
-      <h1 className="text-8xl font-semibold ">BlackJack</h1>
+    <div className="flex flex-col items-center text-white">
+      <h1 className="text-8xl font-semibold">BlackJack</h1>
       <div className="flex flex-col items-center mt-8 space-y-4">
-        {/* Champ de saisie du nom de la partie */}
         <div className="flex items-center space-x-2">
           <FaGamepad className="text-white" size={30} />
           <input
@@ -56,7 +57,6 @@ export default function Home() {
           />
         </div>
 
-        {/* Champs de saisie des noms des joueurs */}
         {playerNames.map((name, index) => (
           <div key={index} className="flex items-center space-x-2">
             <FaUser className="text-white" size={27} />
@@ -69,13 +69,12 @@ export default function Home() {
               required
             />
             <FaXmark className="text-white" size={27} />
-            <button className="Delete" onClick={() => removePlayer(index)}>
+            <button onClick={() => removePlayer(index)} className="text-white">
               X
             </button>
           </div>
         ))}
 
-        {/* Bouton "+" pour ajouter un joueur */}
         <button
           onClick={addPlayerInput}
           className="px-3 py-2 bg-black text-white rounded-md shadow hover:bg-gray-800 mt-2"
@@ -85,7 +84,7 @@ export default function Home() {
 
         <button
           onClick={handleCreateGame}
-          className="px-4 py-2 bg-black text-white rounded-none  shadow  mt-4"
+          className="px-4 py-2 bg-black text-white rounded-none shadow mt-4"
         >
           Create Game
         </button>
